@@ -1,6 +1,5 @@
 import { PipelineStage } from 'mongoose';
 import { buildMetadataPopulationPipeline } from '../../populate-metadata';
-import { COLLECTION_NAMES } from '@lightwork/database/src/schema/constants/collection-names.constants';
 
 /**
  * Builds a pipeline for populating events metadata

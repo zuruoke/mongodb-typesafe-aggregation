@@ -1,6 +1,5 @@
 import { PipelineStage } from 'mongoose';
-import { COLLECTION_NAMES } from '@lightwork/database/src/schema/constants/collection-names.constants';
-import { MessageStatus } from '@lightwork/database/src/types/communication/messages/message-status';
+
 
 export const getConversationActivityPipeline = (
   searchText?: string,

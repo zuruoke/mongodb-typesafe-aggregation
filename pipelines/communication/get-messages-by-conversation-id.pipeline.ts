@@ -1,5 +1,4 @@
 import { PipelineStage, Types } from 'mongoose';
-import { COLLECTION_NAMES } from '@lightwork/database/src/schema/constants/collection-names.constants';
 
 export const getMessagesByConversationIdPipeline = (
   conversationId: string,

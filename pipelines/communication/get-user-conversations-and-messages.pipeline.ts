@@ -1,4 +1,3 @@
-import { COLLECTION_NAMES } from '@lightwork/database/src/schema/constants';
 import { PipelineStage } from 'mongoose';
 
 export const getUserConversationsPipeline: PipelineStage[] = [
