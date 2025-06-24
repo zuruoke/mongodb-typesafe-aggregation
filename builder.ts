@@ -19,7 +19,7 @@ import { bucketStage, BucketSpec } from './stages/bucket';
 import { bucketAutoStage, BucketAutoSpec } from './stages/bucket-auto';
 import { redactStage, RedactSpec } from './stages/redact';
 import { PipelineStage } from 'mongoose';
-import { MatchFilter, Merge } from '../types';
+import { MatchFilter, Merge } from './types';
 
 /**
  * Builder class for constructing MongoDB aggregation pipelines.
@@ -125,7 +125,7 @@ export class PipelineBuilder<T> {
    * @returns The builder instance.
    */
   public sort(spec: Partial<Record<keyof T, 1 | -1>>): this {
-    this.stages.push(sortStage(spec));
+    this.stages.push(sortStage(spec) as PipelineStage);
     return this;
   }
 
