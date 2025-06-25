@@ -3,8 +3,10 @@
  *
  * @template T - The type of the value to store in each field.
  */
+export type ProjectField = 0 | 1 | boolean | { [key: string]: any };
+
 export interface ProjectSpec<T> {
-  [key: string]: T;
+  [key: string]: ProjectField;
 }
 
 /**
