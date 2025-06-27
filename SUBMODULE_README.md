@@ -4,10 +4,12 @@
 
 1. [Overview](#overview)
 2. [Initial Setup](#initial-setup)
-3. [Working with the Submodule](#working-with-the-submodule)
-4. [Best Practices](#best-practices)
-5. [Common Commands](#common-commands)
-6. [Troubleshooting](#troubleshooting)
+3. [Package Integration Setup](#package-integration)
+4. [Working with the Submodule](#working-with-the-submodule)
+5. [Development Workflow](#development-workflow)
+6. [Best Practices](#best-practices)
+7. [Common Commands](#common-commands)
+8. [Troubleshooting](#troubleshooting)
 
 ## 📖 Overview <a name="overview"></a>
 
@@ -25,6 +27,94 @@ git clone --recursive <main-repo-url>
 
 # OR if already cloned, initialize submodules
 git submodule update --init --recursive
+```
+
+## 📦 Package Integration Setup <a name="package-integration"></a>
+
+### 🔗 How the Integration Works
+
+The submodule accesses the main aggregation module through a **local file dependency**. This solves the issue that git submodules cannot access parent directory files through relative paths like `../../`.
+
+#### 🛠 Setup Process (Already Done)
+
+1. **Parent Package Configuration:**
+   ```json
+   // aggregation/package.json
+   {
+     "name": "mongodb-typesafe-aggregation",
+     "main": "index.ts",
+     "types": "index.ts",
+     "exports": {
+       "./builder": "./builder.ts",
+       "./types/filter": "./types/filter.ts"
+     }
+   }
+   ```
+
+2. **Local File Installation:**
+   ```bash
+   cd mongodb-pipeline-demo
+   npm install file:../
+   ```
+
+3. **Import Configuration:**
+   ```typescript
+   // In submodule files
+   import { PipelineBuilder } from 'mongodb-typesafe-aggregation/builder';
+   import { FilterOperator } from 'mongodb-typesafe-aggregation/types/filter';
+   ```
+
+#### 🔍 What Happens Under the Hood
+
+- **Symbolic Link:** `npm install file:../` creates a symlink in `node_modules/mongodb-typesafe-aggregation -> ../..`
+- **Live Updates:** Changes in the main aggregation module are immediately reflected in the submodule
+- **Type Safety:** Full TypeScript support with autocomplete and error checking
+
+### 🔄 Ensuring Changes Are Integrated
+
+When you make changes to the aggregation module, follow this workflow to guarantee integration:
+
+#### 🔹 Step 1: Make Changes in Main Module
+```bash
+# Work in the main aggregation directory
+cd /path/to/aggregation
+# Edit builder.ts, types/filter.ts, etc.
+```
+
+#### 🔹 Step 2: Test in Submodule Immediately
+```bash
+# Navigate to submodule
+cd mongodb-pipeline-demo
+
+# No reinstall needed! Changes are live via symlink
+# Run TypeScript check
+npx tsc --noEmit
+
+# Test your code
+npm run demo
+```
+
+#### 🔹 Step 3: Verify Integration
+```bash
+# Check if symlink is working
+ls -la node_modules/mongodb-typesafe-aggregation
+# Should show: mongodb-typesafe-aggregation -> ../..
+
+# Verify imports work
+node -e "console.log(require('mongodb-typesafe-aggregation/package.json').name)"
+```
+
+#### 🔹 Step 4: Handle Breaking Changes
+If you make breaking changes to the aggregation module:
+
+```bash
+# Update imports in submodule if needed
+# Test thoroughly
+npm run setup && npm run demo
+
+# Reinstall if symlink breaks
+npm uninstall mongodb-typesafe-aggregation
+npm install file:../
 ```
 
 ## 🛠 Working with the Submodule <a name="working-with-the-submodule"></a>
@@ -89,6 +179,83 @@ git push origin your-feature-branch-name
 # OR create a local-only branch for testing
 # (no push required)
 ```
+
+## 🚀 Development Workflow <a name="development-workflow"></a>
+
+### 🔄 Working with Both Repositories
+
+When developing features that span both the aggregation module and the submodule demo:
+
+#### 🔹 Typical Development Flow
+
+```bash
+# 1. Start in main aggregation repo
+cd /path/to/aggregation
+
+# 2. Create feature branch
+git checkout -b feature/new-aggregation-stage
+
+# 3. Make changes to aggregation code
+# Edit builder.ts, add new stages, modify types, etc.
+
+# 4. Test immediately in submodule
+cd mongodb-pipeline-demo
+git checkout -b chimzuru/test-new-stage
+
+# 5. Update demo code to use new features
+# Edit src/index.ts to showcase new functionality
+
+# 6. Verify everything works
+npm run setup && npm run demo
+
+# 7. Commit changes in submodule
+git add . && git commit -m "feat: demo new aggregation stage"
+
+# 8. Go back and commit main changes
+cd ..
+git add . && git commit -m "feat: add new aggregation stage"
+```
+
+### ⚡ Quick Testing Cycle
+
+```bash
+# Make change in aggregation module
+echo "// New feature" >> builder.ts
+
+# Instantly test in submodule (no reinstall needed!)
+cd mongodb-pipeline-demo
+npx tsc --noEmit  # Check types
+npm run demo      # Run demo
+```
+
+### 🔍 Debugging Integration Issues
+
+If imports stop working:
+
+```bash
+# 1. Check symlink status
+ls -la node_modules/mongodb-typesafe-aggregation
+
+# 2. Verify package structure
+cat ../package.json | grep -A 10 "exports"
+
+# 3. Test direct import
+node -e "console.log(require.resolve('mongodb-typesafe-aggregation/builder'))"
+
+# 4. Reinstall if needed
+npm uninstall mongodb-typesafe-aggregation
+npm install file:../
+```
+
+### 📊 Integration Testing Checklist
+
+Before pushing changes:
+
+- [ ] TypeScript compilation passes: `npx tsc --noEmit`
+- [ ] Demo runs successfully: `npm run demo`
+- [ ] All imports resolve correctly
+- [ ] No runtime errors in aggregation pipeline execution
+- [ ] New features are properly demonstrated in demo code
 
 ## ✅ Best Practices <a name="best-practices"></a>
 
@@ -216,8 +383,61 @@ git stash list
 git stash pop
 ```
 
+### Issue: Package imports not working
+```bash
+# Check if the symlink exists
+ls -la node_modules/mongodb-typesafe-aggregation
+
+# If broken, reinstall the local dependency
+npm uninstall mongodb-typesafe-aggregation
+npm install file:../
+
+# Verify the package is properly linked
+npm ls mongodb-typesafe-aggregation
+```
+
+### Issue: TypeScript errors with imports
+```bash
+# Check the parent package exports
+cat ../package.json | grep -A 10 "exports"
+
+# Clear TypeScript cache
+rm -rf node_modules/.cache
+npx tsc --noEmit
+
+# Test specific import resolution
+node -e "console.log(require.resolve('mongodb-typesafe-aggregation/builder'))"
+```
+
+### Issue: Changes in aggregation module not reflected
+This usually means the symlink is broken:
+
+```bash
+# Verify symlink target
+ls -la node_modules/mongodb-typesafe-aggregation
+# Should show: mongodb-typesafe-aggregation -> ../..
+
+# If not, reinstall
+npm install file:../
+
+# Changes should now be live instantly
+```
+
+### Issue: Demo doesn't run after aggregation changes
+```bash
+# Check for compilation errors
+npx tsc --noEmit
+
+# Verify database connection
+npm run setup
+
+# Run with verbose logging
+DEBUG=* npm run demo
+```
+
 ## 🎯 Quick Reference
 
+### Git Submodule Commands
 | Action | Command |
 |--------|---------|
 | Navigate to submodule | `cd mongodb-pipeline-demo` |
@@ -227,10 +447,23 @@ git stash pop
 | Return to main repo | `cd ..` |
 | Update submodule | `git submodule update --remote` |
 
+### Package Integration Commands
+| Action | Command |
+|--------|---------|
+| Install aggregation module | `npm install file:../` |
+| Check symlink status | `ls -la node_modules/mongodb-typesafe-aggregation` |
+| Verify TypeScript | `npx tsc --noEmit` |
+| Test integration | `npm run demo` |
+| Reinstall if broken | `npm uninstall mongodb-typesafe-aggregation && npm install file:../` |
+| Check package linking | `npm ls mongodb-typesafe-aggregation` |
+
 ## 📝 Notes
 
 - The submodule points to: https://github.com/augustinebest/mongodb-pipeline-demo.git
-- Changes in the submodule do NOT affect the main repository
-- Always work on your own branches within the submodule
-- The `.gitignore` entry prevents accidental commits to main repo
-- Test your changes thoroughly before pushing to the submodule repository 
+- **Package Integration:** The submodule uses `npm install file:../` to access the main aggregation module
+- **Live Updates:** Changes in the aggregation module are immediately reflected in the submodule via symlink
+- **Isolation:** Changes in the submodule do NOT affect the main repository
+- **Branch Safety:** Always work on your own branches within the submodule
+- **Git Ignore:** The `.gitignore` entry prevents accidental commits to main repo
+- **Testing:** Use `npm run demo` to test integration after making aggregation changes
+- **TypeScript:** Full type safety and autocomplete support across both repositories 
