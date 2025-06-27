@@ -1,0 +1,3 @@
+[submodule "mongodb-pipeline-demo"]
+	path = mongodb-pipeline-demo
+	url = https://github.com/augustinebest/mongodb-pipeline-demo.git
