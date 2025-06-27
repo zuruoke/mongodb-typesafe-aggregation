@@ -1,4 +1,4 @@
-import { MatchFilter } from '../../types';
+import { MatchFilter } from '../types';
 
 /**
  * Creates a `$match` aggregation stage to filter documents based on a specified condition.

@@ -4,7 +4,7 @@
  * @template T - The type of the value to assign to each field.
  */
 export interface AddFieldsSpec<T> {
-  [key: string]: T;
+  [key: string]: T | { [key: string]: any } | any[];
 }
 
 /**
