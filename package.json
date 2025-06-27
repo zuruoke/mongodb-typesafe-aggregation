@@ -2,7 +2,14 @@
   "name": "mongodb-typesafe-aggregation",
   "version": "1.0.0",
   "description": "## Table of Contents",
-  "main": "index.js",
+  "main": "index.ts",
+  "types": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./builder": "./builder.ts",
+    "./types": "./types/index.ts",
+    "./types/filter": "./types/filter.ts"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
