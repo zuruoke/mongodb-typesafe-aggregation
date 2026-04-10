@@ -38,6 +38,7 @@ The submodule accesses the main aggregation module through a **local file depend
 #### 🛠 Setup Process (Already Done)
 
 1. **Parent Package Configuration:**
+
    ```json
    // aggregation/package.json
    {
@@ -52,6 +53,7 @@ The submodule accesses the main aggregation module through a **local file depend
    ```
 
 2. **Local File Installation:**
+
    ```bash
    cd mongodb-pipeline-demo
    npm install file:../
@@ -75,6 +77,7 @@ The submodule accesses the main aggregation module through a **local file depend
 When you make changes to the aggregation module, follow this workflow to guarantee integration:
 
 #### 🔹 Step 1: Make Changes in Main Module
+
 ```bash
 # Work in the main aggregation directory
 cd /path/to/aggregation
@@ -82,6 +85,7 @@ cd /path/to/aggregation
 ```
 
 #### 🔹 Step 2: Test in Submodule Immediately
+
 ```bash
 # Navigate to submodule
 cd mongodb-pipeline-demo
@@ -95,6 +99,7 @@ npm run demo
 ```
 
 #### 🔹 Step 3: Verify Integration
+
 ```bash
 # Check if symlink is working
 ls -la node_modules/mongodb-typesafe-aggregation
@@ -105,6 +110,7 @@ node -e "console.log(require('mongodb-typesafe-aggregation/package.json').name)"
 ```
 
 #### 🔹 Step 4: Handle Breaking Changes
+
 If you make breaking changes to the aggregation module:
 
 ```bash
@@ -269,6 +275,7 @@ Before pushing changes:
 ### 🔄 Workflow Examples
 
 #### Testing a Specific Branch:
+
 ```bash
 cd mongodb-pipeline-demo
 git fetch origin
@@ -278,6 +285,7 @@ git checkout -b your-name/test-advanced-lookups
 ```
 
 #### Updating to Latest Master:
+
 ```bash
 cd mongodb-pipeline-demo
 git fetch origin
@@ -287,6 +295,7 @@ git checkout -b your-name/latest-master-test
 ```
 
 #### Working on Multiple Features:
+
 ```bash
 # Feature 1
 cd mongodb-pipeline-demo
@@ -303,6 +312,7 @@ git checkout -b your-name/test-feature-2
 ## 📋 Common Commands <a name="common-commands"></a>
 
 ### Navigation & Status
+
 ```bash
 # Navigate to submodule
 cd mongodb-pipeline-demo
@@ -319,6 +329,7 @@ cd ..
 ```
 
 ### Branch Management
+
 ```bash
 # Update submodule to latest
 git submodule update --remote mongodb-pipeline-demo
@@ -335,6 +346,7 @@ git branch -d <branch-name>
 ```
 
 ### Syncing Changes
+
 ```bash
 # Pull latest changes from origin
 git fetch origin
@@ -347,12 +359,15 @@ git push origin <your-branch-name>
 ## 🔧 Troubleshooting <a name="troubleshooting"></a>
 
 ### Issue: Submodule not initialized
+
 ```bash
 git submodule update --init --recursive
 ```
 
 ### Issue: Submodule appears modified in main repo
+
 This is expected! The submodule is in `.gitignore` to prevent accidental commits.
+
 ```bash
 # In main repo - this is normal and expected
 git status
@@ -360,6 +375,7 @@ git status
 ```
 
 ### Issue: Can't switch branches in submodule
+
 ```bash
 cd mongodb-pipeline-demo
 # Stash any uncommitted changes
@@ -369,12 +385,14 @@ git checkout <target-branch>
 ```
 
 ### Issue: Submodule directory is empty
+
 ```bash
 # Re-initialize the submodule
 git submodule update --init --recursive mongodb-pipeline-demo
 ```
 
 ### Issue: Lost changes in submodule
+
 ```bash
 cd mongodb-pipeline-demo
 # Check for stashed changes
@@ -384,6 +402,7 @@ git stash pop
 ```
 
 ### Issue: Package imports not working
+
 ```bash
 # Check if the symlink exists
 ls -la node_modules/mongodb-typesafe-aggregation
@@ -397,6 +416,7 @@ npm ls mongodb-typesafe-aggregation
 ```
 
 ### Issue: TypeScript errors with imports
+
 ```bash
 # Check the parent package exports
 cat ../package.json | grep -A 10 "exports"
@@ -410,6 +430,7 @@ node -e "console.log(require.resolve('mongodb-typesafe-aggregation/builder'))"
 ```
 
 ### Issue: Changes in aggregation module not reflected
+
 This usually means the symlink is broken:
 
 ```bash
@@ -424,6 +445,7 @@ npm install file:../
 ```
 
 ### Issue: Demo doesn't run after aggregation changes
+
 ```bash
 # Check for compilation errors
 npx tsc --noEmit
@@ -438,24 +460,26 @@ DEBUG=* npm run demo
 ## 🎯 Quick Reference
 
 ### Git Submodule Commands
-| Action | Command |
-|--------|---------|
-| Navigate to submodule | `cd mongodb-pipeline-demo` |
-| Check available branches | `git branch -r` |
-| Switch to branch | `git checkout origin/<branch>` |
-| Create your branch | `git checkout -b your-name/branch` |
-| Return to main repo | `cd ..` |
-| Update submodule | `git submodule update --remote` |
+
+| Action                   | Command                            |
+| ------------------------ | ---------------------------------- |
+| Navigate to submodule    | `cd mongodb-pipeline-demo`         |
+| Check available branches | `git branch -r`                    |
+| Switch to branch         | `git checkout origin/<branch>`     |
+| Create your branch       | `git checkout -b your-name/branch` |
+| Return to main repo      | `cd ..`                            |
+| Update submodule         | `git submodule update --remote`    |
 
 ### Package Integration Commands
-| Action | Command |
-|--------|---------|
-| Install aggregation module | `npm install file:../` |
-| Check symlink status | `ls -la node_modules/mongodb-typesafe-aggregation` |
-| Verify TypeScript | `npx tsc --noEmit` |
-| Test integration | `npm run demo` |
-| Reinstall if broken | `npm uninstall mongodb-typesafe-aggregation && npm install file:../` |
-| Check package linking | `npm ls mongodb-typesafe-aggregation` |
+
+| Action                     | Command                                                              |
+| -------------------------- | -------------------------------------------------------------------- |
+| Install aggregation module | `npm install file:../`                                               |
+| Check symlink status       | `ls -la node_modules/mongodb-typesafe-aggregation`                   |
+| Verify TypeScript          | `npx tsc --noEmit`                                                   |
+| Test integration           | `npm run demo`                                                       |
+| Reinstall if broken        | `npm uninstall mongodb-typesafe-aggregation && npm install file:../` |
+| Check package linking      | `npm ls mongodb-typesafe-aggregation`                                |
 
 ## 📝 Notes
 
@@ -466,4 +490,4 @@ DEBUG=* npm run demo
 - **Branch Safety:** Always work on your own branches within the submodule
 - **Git Ignore:** The `.gitignore` entry prevents accidental commits to main repo
 - **Testing:** Use `npm run demo` to test integration after making aggregation changes
-- **TypeScript:** Full type safety and autocomplete support across both repositories 
+- **TypeScript:** Full type safety and autocomplete support across both repositories

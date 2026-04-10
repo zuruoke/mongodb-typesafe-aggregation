@@ -3,4 +3,5 @@ dist
 mongodb-pipeline-demo
 .DS_Store
 coverage
+publish.sh
 
