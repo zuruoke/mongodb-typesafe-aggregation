@@ -1,2 +1,6 @@
 node_modules
+dist
 mongodb-pipeline-demo
+.DS_Store
+coverage
+

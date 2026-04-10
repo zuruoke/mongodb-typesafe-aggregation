@@ -1,208 +1,247 @@
-# 🛠 Aggregation Module Documentation
+# mongodb-typesafe-aggregation
 
-## Table of Contents
+[![npm version](https://img.shields.io/npm/v/mongodb-typesafe-aggregation.svg)](https://www.npmjs.com/package/mongodb-typesafe-aggregation)
+[![CI](https://github.com/zuruoke/mongodb-typesafe-aggregation/actions/workflows/ci.yml/badge.svg)](https://github.com/zuruoke/mongodb-typesafe-aggregation/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-1. [Introduction](#introduction)
-2. [The Problem: Why Change Was Needed](#problem)
-3. [The Solution: Fluent, Type-Safe Aggregations](#solution)
-4. [Migration Guide: Step-by-Step](#migration)
-5. [Mapping Old to New Patterns](#mapping)
-6. [Before vs After: Real Examples](#examples)
-7. [Best Practices](#best-practices)
-8. [Directory Structure Overview](#structure)
-9. [Further Reading](#further-reading)
+A type-safe, fluent builder for MongoDB aggregation pipelines. Build complex aggregations with full TypeScript autocomplete and compile-time error checking — no more fragile raw JSON blobs.
 
-## 📖 Introduction <a name="introduction"></a>
-
-This module transforms how we build MongoDB aggregation pipelines. It provides a **type-safe**, **fluent**, and **maintainable** way to structure complex queries without worrying about fragile JSON blobs.
-
-## ❌ The Problem: Why Change Was Needed <a name="problem"></a>
-
-Old aggregation pipelines looked like this:
-
-```ts
-[
-  { $match: { officeId: query.officeId } },
-  {
-    $addFields: {
-      hasAccess: {
-        $cond: { if: { $eq: ['$role', 'admin'] }, then: true, else: false },
-      },
-    },
-  },
-];
-```
-
-### Problems:
-
-- Hard to read 😵
-- No type hints 🧩
-- Runtime-only errors 🚨
-- Difficult to test 🧪
-
-## ✅ The Solution: Fluent, Type-Safe Aggregations <a name="solution"></a>
-
-Using `PipelineBuilder` and `filter()` operators:
-
-```ts
-new PipelineBuilder()
-  .match({ officeId: query.officeId })
-  .addFields({
-    isAdmin: filter<boolean>()
-      .cond(filter<string>().fieldEq('$role', 'admin').build(), true, false)
-      .build(),
-  })
-  .build();
-```
-
-### 🔥 Advantages
-
-- **Type-safe** pipelines at compile time.
-- **Autocomplete** for fields and operators.
-- **Readable and maintainable** structure.
-- **Unit-testable** simple arrays.
-
-## 🛠 Migration Guide: Step-by-Step <a name="migration"></a>
-
-### 🔹 Step 1: Find Legacy Pipelines
-
-Search for usage of `aggregate([...])` or raw `PipelineStage[]` arrays.
-
-### 🔹 Step 2: Initialize a PipelineBuilder
-
-```ts
-const pipeline = new PipelineBuilder();
-```
-
-### 🔹 Step 3: Convert Each Stage Carefully
-
-| MongoDB Stage | New Fluent Style                    |
-| :------------ | :---------------------------------- |
-| `$match`      | `.match({...})`                     |
-| `$addFields`  | `.addFields({...})`                 |
-| `$project`    | `.project({...})`                   |
-| `$lookup`     | `.lookup({...})`                    |
-| `$unwind`     | `.unwind('field') or unwind({...})` |
-
-### 🔹 Step 4: Handle Conditional Logic
-
-**Old Way:**
-
-```ts
-$cond: { if: { $eq: ['$role', 'admin'] }, then: true, else: false }
-```
-
-**New Way:**
-
-```ts
-filter<boolean>()
-  .cond(filter<string>().fieldEq('$role', 'admin').build(), true, false)
-  .build();
-```
-
-### 🔹 Step 5: Validate Output
-
-- Snapshot the pipeline.
-- Compare outputs with old version.
-- Use unit tests.
-
-## 🔥 Mapping Old to New Patterns <a name="mapping"></a>
-
-| 🏛️ Old Pattern                               | 🚀 New Fluent Pattern                             |
-| :------------------------------------------- | :------------------------------------------------ |
-| `$match: { status: 'active' }`               | `.match({ status: 'active' })`                    |
-| `$addFields: { total: { $sum: '$amount' } }` | `.addFields({ total: sum('$amount') })`           |
-| `$lookup`                                    | `.lookup({ from, localField, foreignField, as })` |
-| `$unwind: 'items'`                           | `.unwind('items')`                                |
-| `$cond` expressions                          | `.addFields({ field: filter().cond(...) })`       |
-
-## 🔥 Before vs After: Real Examples <a name="examples"></a>
-
-### 🛑 Before (Old Style)
-
-```ts
-[
-  { $match: { status: 'PENDING' } },
-  {
-    $addFields: {
-      isLate: {
-        $cond: {
-          if: { $gt: ['$dueDate', new Date()] },
-          then: true,
-          else: false,
-        },
-      },
-    },
-  },
-];
-```
-
-### 🚀 After (New Style)
-
-```ts
-new PipelineBuilder()
-  .match({ status: 'PENDING' })
-  .addFields({
-    isLate: filter<boolean>()
-      .cond(filter<Date>().fieldGt('$dueDate', new Date()).build(), true, false)
-      .build(),
-  })
-  .build();
-```
-
-## 📦 Lookup Example <a name="lookup-example"></a>
-
-### 👩‍💻 Old Way:
-
-```ts
-[
-  {
-    $lookup: {
-      from: COLLECTION_NAMES.TRANSLATIONS,
-      localField: '_id',
-      foreignField: 'messageId',
-      as: 'translation',
-    },
-  },
-];
-```
-
-### 🚀 New Fluent Style:
-
-```ts
-new PipelineBuilder()
-  .lookup({
-    from: COLLECTION_NAMES.TRANSLATIONS,
-    localField: '_id',
-    foreignField: 'messageId',
-    as: 'translation',
-  })
-  .build();
-```
-
-**Tip:** You can also include `pipeline` inside `lookup` if you need deeper filtering!
-
-## ✍️ Best Practices <a name="best-practices"></a>
-
-- **Prefer short, chainable stages.**
-- **Use `filter()` instead of raw operators.**
-- **Write helper functions** for repeated conditions.
-- **Snapshot complex pipelines** during migration.
-- **Comment non-trivial logic.**
-
-## 📂 Directory Structure Overview <a name="structure"></a>
+## Installation
 
 ```bash
-packages/src/aggregation/
-├── builder.ts
-├── constants.ts
-├── stages/
-├── types/
-├── index.ts
+npm install mongodb-typesafe-aggregation
 ```
 
-## 📚 Further Reading <a name="further-reading"></a>
+> **Peer dependency:** requires `mongoose >= 7`.
 
-- [MongoDB Aggregation Framework – Official Docs](https://www.mongodb.com/docs/manual/aggregation/)
-- [Aggregation Optimization in MongoDB (Case Study)](https://medium.com/mongodb/aggregation-optimization-in-mongodb-a-case-study-from-the-field-part-1-15aec13fe1bc)
-- [Fluent Aggregation Builder (npm)](https://www.npmjs.com/package/mongodb-aggregation-builder)
+## Quick Start
+
+```ts
+import { PipelineBuilder } from 'mongodb-typesafe-aggregation/builder';
+import { filter } from 'mongodb-typesafe-aggregation/types/filter';
+
+interface Order {
+  _id: string;
+  status: 'pending' | 'completed';
+  total: number;
+  customerId: string;
+}
+
+const pipeline = new PipelineBuilder<Order>()
+  .match({ status: filter<string>().eq('pending').build() })
+  .sort({ total: -1 })
+  .limit(20)
+  .build();
+
+// Pass to your collection
+const results = await db.collection<Order>('orders').aggregate(pipeline).toArray();
+```
+
+## Why
+
+Raw aggregation pipelines have no type safety:
+
+```ts
+// Before — easy to mistype, no autocomplete, fails only at runtime
+[
+  { $match: { satuts: 'pending' } },
+  {
+    $addFields: {
+      isLate: { $cond: { if: { $gt: ['$dueDate', new Date()] }, then: true, else: false } },
+    },
+  },
+];
+```
+
+With `mongodb-typesafe-aggregation`:
+
+```ts
+// After — typos caught at compile time, full autocomplete
+new PipelineBuilder<Order>()
+  .match({ status: filter<string>().eq('pending').build() })
+  .addFields({
+    isLate: filter<boolean>()
+      .cond({ $gt: ['$dueDate', new Date()] }, { $literal: true }, false)
+      .build(),
+  })
+  .build();
+```
+
+## API Reference
+
+### PipelineBuilder\<T\>
+
+Import:
+
+```ts
+import { PipelineBuilder } from 'mongodb-typesafe-aggregation/builder';
+```
+
+All methods return `this` (for same-type stages) or a new `PipelineBuilder` instance (for stages that change the document shape). Call `.build()` at the end to get the `PipelineStage[]` array.
+
+#### Stage methods
+
+| Method               | MongoDB Stage  | Notes                                    |
+| -------------------- | -------------- | ---------------------------------------- |
+| `.match(filter)`     | `$match`       | Accepts `FilterOperator` values          |
+| `.lookup(spec)`      | `$lookup`      | Returns `PipelineBuilder<T & U>`         |
+| `.group(spec)`       | `$group`       | Returns `PipelineBuilder<G>`             |
+| `.addFields(spec)`   | `$addFields`   | Returns `PipelineBuilder<T & U>`         |
+| `.set(spec)`         | `$set`         | Alias for `$addFields` (Mongo 4.2+)      |
+| `.project(spec)`     | `$project`     | Returns `PipelineBuilder<G>`             |
+| `.unset(fields)`     | `$unset`       | Accepts `string` or `string[]`           |
+| `.sort(spec)`        | `$sort`        | Keys must be `keyof T`                   |
+| `.skip(n)`           | `$skip`        |                                          |
+| `.limit(n)`          | `$limit`       |                                          |
+| `.unwind(spec)`      | `$unwind`      | Accepts `string` path or `UnwindSpec`    |
+| `.replaceRoot(spec)` | `$replaceRoot` | Returns `PipelineBuilder<G>`             |
+| `.count(fieldName)`  | `$count`       | Returns `PipelineBuilder<{[k]: number}>` |
+| `.facet(spec)`       | `$facet`       | Returns `PipelineBuilder<G>`             |
+| `.unionWith(spec)`   | `$unionWith`   |                                          |
+| `.graphLookup(spec)` | `$graphLookup` |                                          |
+| `.bucket(spec)`      | `$bucket`      |                                          |
+| `.bucketAuto(spec)`  | `$bucketAuto`  |                                          |
+| `.redact(spec)`      | `$redact`      |                                          |
+| `.merge(spec)`       | `$merge`       | Terminal — write to another collection   |
+| `.raw(stage)`        | any            | Escape hatch for unsupported stages      |
+| `.build()`           | —              | Returns the `PipelineStage[]` array      |
+
+### FilterOperator\<T\>
+
+Import:
+
+```ts
+import { FilterOperator, filter } from 'mongodb-typesafe-aggregation/types/filter';
+
+// These two are equivalent
+new FilterOperator<number>().gt(100).build();
+filter<number>().gt(100).build();
+```
+
+#### Comparison
+
+| Method        | Operator |
+| ------------- | -------- |
+| `.eq(value)`  | `$eq`    |
+| `.ne(value)`  | `$ne`    |
+| `.gt(value)`  | `$gt`    |
+| `.gte(value)` | `$gte`   |
+| `.lt(value)`  | `$lt`    |
+| `.lte(value)` | `$lte`   |
+
+#### Array
+
+| Method         | Operator |
+| -------------- | -------- |
+| `.in(values)`  | `$in`    |
+| `.nin(values)` | `$nin`   |
+| `.all(values)` | `$all`   |
+| `.size(n)`     | `$size`  |
+
+#### Element & string
+
+| Method            | Operator  |
+| ----------------- | --------- |
+| `.exists(bool)`   | `$exists` |
+| `.regex(pattern)` | `$regex`  |
+
+#### Expression helpers
+
+| Method                   | Operator | Use case                           |
+| ------------------------ | -------- | ---------------------------------- |
+| `.fieldEq(field, value)` | `$eq`    | `[$field, value]` form for `$cond` |
+| `.fieldNe(field, value)` | `$ne`    | `[$field, value]` form for `$cond` |
+| `.cond(if, then, else)`  | `$cond`  | Ternary expression                 |
+
+Methods can be chained. Multiple comparison operators on the same instance produce a combined object:
+
+```ts
+filter<number>().gte(100).lte(999).build();
+// → { $gte: 100, $lte: 999 }
+```
+
+## Examples
+
+### `$match` with multiple operators
+
+```ts
+new PipelineBuilder<Product>()
+  .match({
+    price: filter<number>().gte(100).lte(999).build(),
+    category: filter<string>().in(['electronics', 'furniture']).build(),
+    stock: filter<number>().exists(true).build(),
+  })
+  .build();
+```
+
+### `$lookup` + `$addFields` + `$project`
+
+```ts
+new PipelineBuilder<Product>()
+  .lookup({ from: 'orders', localField: '_id', foreignField: 'productId', as: 'orders' })
+  .addFields({
+    orderedQuantity: { $sum: '$orders.quantity' },
+    remainingStock: { $subtract: ['$stock', { $sum: '$orders.quantity' }] },
+  })
+  .project({ _id: 0, name: 1, remainingStock: 1 })
+  .build();
+```
+
+### `$group`
+
+```ts
+new PipelineBuilder<Order>()
+  .group({ _id: '$status', totalOrders: { $sum: 1 }, totalQty: { $sum: '$quantity' } })
+  .sort({ _id: 1 })
+  .build();
+```
+
+### Conditional field with `$cond`
+
+```ts
+new PipelineBuilder<Product>()
+  .addFields({
+    isExpensive: filter<boolean>()
+      .cond({ $gt: ['$price', 500] }, { $literal: true }, false)
+      .build(),
+  })
+  .build();
+```
+
+### `$facet`
+
+```ts
+new PipelineBuilder<Product>()
+  .facet({
+    expensive: [{ $match: { price: { $gte: 700 } } }],
+    lowStock: [{ $match: { stock: { $lt: 20 } } }],
+  })
+  .build();
+```
+
+### `$graphLookup`
+
+```ts
+new PipelineBuilder<Product>()
+  .graphLookup({
+    from: 'products',
+    startWith: '$relatedIds',
+    connectFromField: 'relatedIds',
+    connectToField: '_id',
+    as: 'relatedProducts',
+    maxDepth: 2,
+  })
+  .build();
+```
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
+## License
+
+[MIT](LICENSE)

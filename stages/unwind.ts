@@ -3,7 +3,8 @@
  *
  * @template T - The type of the value to store in each field.
  */
-export interface UnwindSpec<T> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface UnwindSpec<_T> {
   path: string;
   includeArrayIndex?: string;
   preserveNullAndEmptyArrays?: boolean;

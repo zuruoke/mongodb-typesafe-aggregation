@@ -30,11 +30,7 @@ export class FilterOperator<T> {
    * @param thenValue - The value to return if condition is true
    * @param elseValue - The value to return if condition is false
    */
-  cond(
-    condition: Record<string, unknown>,
-    thenValue: Record<string, unknown>,
-    elseValue: T
-  ): this {
+  cond(condition: Record<string, unknown>, thenValue: Record<string, unknown>, elseValue: T): this {
     this.operator['$cond'] = {
       if: condition,
       then: thenValue,

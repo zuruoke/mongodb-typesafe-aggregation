@@ -85,9 +85,7 @@ export class PipelineBuilder<T> {
    * @param spec - The specification for the `$group` stage.
    * @returns The builder instance.
    */
-  public group<G extends Record<string, unknown>>(
-    spec: GroupSpec<T>,
-  ): PipelineBuilder<G> {
+  public group<G extends Record<string, unknown>>(spec: GroupSpec<T>): PipelineBuilder<G> {
     const newStages = [...this.stages, groupStage(spec)];
     return new PipelineBuilder<G>(newStages as PipelineStage[]);
   }
@@ -111,9 +109,7 @@ export class PipelineBuilder<T> {
    * @param spec - The specification for the `$project` stage.
    * @returns The builder instance.
    */
-  public project<G extends Record<string, unknown>>(
-    spec: ProjectSpec<T>,
-  ): PipelineBuilder<G> {
+  public project<G extends Record<string, unknown>>(spec: ProjectSpec<T>): PipelineBuilder<G> {
     const newStages = [...this.stages, projectStage(spec)];
     return new PipelineBuilder<G>(newStages as PipelineStage[]);
   }
@@ -157,9 +153,7 @@ export class PipelineBuilder<T> {
    * @param spec - The specification for the `$facet` stage.
    * @returns The builder instance.
    */
-  public facet<G extends Record<string, unknown>>(
-    spec: FacetSpec<T>,
-  ): PipelineBuilder<G> {
+  public facet<G extends Record<string, unknown>>(spec: FacetSpec<T>): PipelineBuilder<G> {
     const newStages = [...this.stages, facetStage(spec)];
     return new PipelineBuilder<G>(newStages as PipelineStage[]);
   }
@@ -212,9 +206,7 @@ export class PipelineBuilder<T> {
     return this;
   }
 
-  public set<U extends Record<string, any>>(
-    spec: U,
-  ): PipelineBuilder<Merge<T, U>> {
+  public set<U extends Record<string, any>>(spec: U): PipelineBuilder<Merge<T, U>> {
     const newStages = [...this.stages, setStage(spec)];
     return new PipelineBuilder<Merge<T, U>>(newStages as PipelineStage[]);
   }

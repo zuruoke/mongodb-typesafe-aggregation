@@ -1,0 +1,28 @@
+# Source files — consumers get compiled dist/ only
+*.ts
+!*.d.ts
+
+# Test infrastructure
+__tests__/
+coverage/
+jest.config.js
+
+# Linting & formatting config
+eslint.config.mjs
+.prettierrc
+.prettierignore
+tsconfig.eslint.json
+
+# CI / GitHub
+.github/
+
+# Project meta
+mongodb-pipeline-demo/
+SUBMODULE_README.md
+CONTRIBUTING.md
+.gitmodules
+.gitignore
+.DS_Store
+
+# Dev build artifacts
+*.tsbuildinfo

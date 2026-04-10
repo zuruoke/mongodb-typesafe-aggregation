@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "commonjs",
+    "lib": ["ES2018"],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["builder.ts", "index.ts", "constants.ts", "stages/**/*", "types/**/*"],
+  "exclude": ["node_modules", "dist", "mongodb-pipeline-demo", "**/*.test.ts", "**/__tests__/**"]
+}

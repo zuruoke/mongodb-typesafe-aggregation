@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "builder.ts",
+    "index.ts",
+    "constants.ts",
+    "stages/**/*",
+    "types/**/*",
+    "__tests__/**/*"
+  ],
+  "exclude": ["node_modules", "dist", "mongodb-pipeline-demo"]
+}

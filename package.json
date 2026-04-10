@@ -1,22 +1,72 @@
 {
   "name": "mongodb-typesafe-aggregation",
   "version": "1.0.0",
-  "description": "## Table of Contents",
-  "main": "index.ts",
-  "types": "index.ts",
+  "description": "A type-safe, fluent builder for MongoDB aggregation pipelines. Works with both Mongoose and the native MongoDB driver.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": "./index.ts",
-    "./builder": "./builder.ts",
-    "./types": "./types/index.ts",
-    "./types/filter": "./types/filter.ts"
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./builder": {
+      "require": "./dist/builder.js",
+      "types": "./dist/builder.d.ts"
+    },
+    "./types": {
+      "require": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./types/filter": {
+      "require": "./dist/types/filter.js",
+      "types": "./dist/types/filter.d.ts"
+    }
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc --project tsconfig.json",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepublishOnly": "npm run lint && npm test && npm run build",
+    "verify": "npm run drop-db 2>/dev/null; npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "mongodb",
+    "mongoose",
+    "aggregation",
+    "pipeline",
+    "type-safe",
+    "fluent",
+    "builder",
+    "typescript"
+  ],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "mongoose": "^8.16.0"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zuruoke/mongodb-typesafe-aggregation.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zuruoke/mongodb-typesafe-aggregation/issues"
+  },
+  "homepage": "https://github.com/zuruoke/mongodb-typesafe-aggregation#readme",
+  "peerDependencies": {
+    "mongoose": ">=7"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.5.0",
+    "mongoose": "^8.16.0",
+    "prettier": "^3.2.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.4.0"
   }
 }

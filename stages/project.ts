@@ -5,7 +5,8 @@
  */
 export type ProjectField = 0 | 1 | boolean | { [key: string]: any };
 
-export interface ProjectSpec<T> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface ProjectSpec<_T> {
   [key: string]: ProjectField;
 }
 
