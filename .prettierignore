@@ -2,3 +2,4 @@ dist
 node_modules
 coverage
 mongodb-pipeline-demo
+SUBMODULE_README.md
