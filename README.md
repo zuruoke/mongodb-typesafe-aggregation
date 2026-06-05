@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/mongodb-typesafe-aggregation.svg)](https://www.npmjs.com/package/mongodb-typesafe-aggregation)
 [![CI](https://github.com/zuruoke/mongodb-typesafe-aggregation/actions/workflows/ci.yml/badge.svg)](https://github.com/zuruoke/mongodb-typesafe-aggregation/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm downloads](https://img.shields.io/npm/dt/mongodb-typesafe-aggregation.svg)](https://www.npmjs.com/package/mongodb-typesafe-aggregation)
 
 A type-safe, fluent builder for MongoDB aggregation pipelines. Build complex aggregations with full TypeScript autocomplete and compile-time error checking — no more fragile raw JSON blobs.
 
