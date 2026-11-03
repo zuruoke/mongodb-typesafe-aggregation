@@ -1,6 +1,6 @@
 {
   "name": "mongodb-typesafe-aggregation",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A type-safe, fluent builder for MongoDB aggregation pipelines. Works with both Mongoose and the native MongoDB driver.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
