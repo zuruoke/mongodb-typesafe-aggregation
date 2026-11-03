@@ -41,6 +41,13 @@ describe('PipelineBuilder', () => {
         .build();
       expect(pipeline).toEqual([{ $match: { price: { $gt: 500 } } }]);
     });
+
+    it('builds FilterOperator values that were not built', () => {
+      const pipeline = new PipelineBuilder<Product>()
+        .match({ price: new FilterOperator<number>().gte(100).lte(999) })
+        .build();
+      expect(pipeline).toEqual([{ $match: { price: { $gte: 100, $lte: 999 } } }]);
+    });
   });
 
   describe('sort()', () => {
@@ -229,6 +236,15 @@ describe('PipelineBuilder', () => {
       const pipeline = new PipelineBuilder<Product>().merge(spec).build();
       expect(pipeline).toEqual([{ $merge: spec }]);
     });
+
+    it('accepts an update pipeline for whenMatched', () => {
+      const spec = {
+        into: 'summary',
+        whenMatched: [{ $set: { total: { $add: ['$total', '$$new.total'] } } }],
+      };
+      const pipeline = new PipelineBuilder<Product>().merge(spec).build();
+      expect(pipeline).toEqual([{ $merge: spec }]);
+    });
   });
 
   describe('raw()', () => {
@@ -270,6 +286,24 @@ describe('PipelineBuilder', () => {
       const base = new PipelineBuilder<Product>().match({ active: true });
       base.lookup({ from: 'orders', localField: '_id', foreignField: 'productId', as: 'orders' });
       expect(base.build()).toEqual([{ $match: { active: true } }]);
+    });
+
+    it('same-type stages do not mutate the original builder', () => {
+      const base = new PipelineBuilder<Product>().match({ active: true });
+      const cheapest = base.sort({ price: 1 }).limit(1);
+      const newest = base.sort({ _id: -1 }).skip(5);
+
+      expect(base.build()).toEqual([{ $match: { active: true } }]);
+      expect(cheapest.build()).toEqual([
+        { $match: { active: true } },
+        { $sort: { price: 1 } },
+        { $limit: 1 },
+      ]);
+      expect(newest.build()).toEqual([
+        { $match: { active: true } },
+        { $sort: { _id: -1 } },
+        { $skip: 5 },
+      ]);
     });
   });
 });

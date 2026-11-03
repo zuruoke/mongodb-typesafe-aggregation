@@ -7,6 +7,8 @@
 
 A type-safe, fluent builder for MongoDB aggregation pipelines. Build complex aggregations with full TypeScript autocomplete and compile-time error checking — no more fragile raw JSON blobs.
 
+> **Using Python?** The same builder is available for Python as [`mongodb-typesafe-aggregation` on PyPI](https://pypi.org/project/mongodb-typesafe-aggregation/) ([source](https://github.com/zuruoke/mongodb-typesafe-aggregation-py)).
+
 ## Installation
 
 ```bash
@@ -78,34 +80,34 @@ Import:
 import { PipelineBuilder } from 'mongodb-typesafe-aggregation/builder';
 ```
 
-All methods return `this` (for same-type stages) or a new `PipelineBuilder` instance (for stages that change the document shape). Call `.build()` at the end to get the `PipelineStage[]` array.
+Every method returns a new `PipelineBuilder` and leaves the original unchanged, so a base pipeline can be reused for several others. Call `.build()` at the end to get the `PipelineStage[]` array.
 
 #### Stage methods
 
-| Method               | MongoDB Stage  | Notes                                    |
-| -------------------- | -------------- | ---------------------------------------- |
-| `.match(filter)`     | `$match`       | Accepts `FilterOperator` values          |
-| `.lookup(spec)`      | `$lookup`      | Returns `PipelineBuilder<T & U>`         |
-| `.group(spec)`       | `$group`       | Returns `PipelineBuilder<G>`             |
-| `.addFields(spec)`   | `$addFields`   | Returns `PipelineBuilder<T & U>`         |
-| `.set(spec)`         | `$set`         | Alias for `$addFields` (Mongo 4.2+)      |
-| `.project(spec)`     | `$project`     | Returns `PipelineBuilder<G>`             |
-| `.unset(fields)`     | `$unset`       | Accepts `string` or `string[]`           |
-| `.sort(spec)`        | `$sort`        | Keys must be `keyof T`                   |
-| `.skip(n)`           | `$skip`        |                                          |
-| `.limit(n)`          | `$limit`       |                                          |
-| `.unwind(spec)`      | `$unwind`      | Accepts `string` path or `UnwindSpec`    |
-| `.replaceRoot(spec)` | `$replaceRoot` | Returns `PipelineBuilder<G>`             |
-| `.count(fieldName)`  | `$count`       | Returns `PipelineBuilder<{[k]: number}>` |
-| `.facet(spec)`       | `$facet`       | Returns `PipelineBuilder<G>`             |
-| `.unionWith(spec)`   | `$unionWith`   |                                          |
-| `.graphLookup(spec)` | `$graphLookup` |                                          |
-| `.bucket(spec)`      | `$bucket`      |                                          |
-| `.bucketAuto(spec)`  | `$bucketAuto`  |                                          |
-| `.redact(spec)`      | `$redact`      |                                          |
-| `.merge(spec)`       | `$merge`       | Terminal — write to another collection   |
-| `.raw(stage)`        | any            | Escape hatch for unsupported stages      |
-| `.build()`           | —              | Returns the `PipelineStage[]` array      |
+| Method               | MongoDB Stage  | Notes                                         |
+| -------------------- | -------------- | --------------------------------------------- |
+| `.match(filter)`     | `$match`       | Accepts `FilterOperator` values, built or not |
+| `.lookup(spec)`      | `$lookup`      | Returns `PipelineBuilder<T & U>`              |
+| `.group(spec)`       | `$group`       | Returns `PipelineBuilder<G>`                  |
+| `.addFields(spec)`   | `$addFields`   | Returns `PipelineBuilder<T & U>`              |
+| `.set(spec)`         | `$set`         | Alias for `$addFields` (Mongo 4.2+)           |
+| `.project(spec)`     | `$project`     | Returns `PipelineBuilder<G>`                  |
+| `.unset(fields)`     | `$unset`       | Accepts `string` or `string[]`                |
+| `.sort(spec)`        | `$sort`        | Keys must be `keyof T`                        |
+| `.skip(n)`           | `$skip`        |                                               |
+| `.limit(n)`          | `$limit`       |                                               |
+| `.unwind(spec)`      | `$unwind`      | Accepts `string` path or `UnwindSpec`         |
+| `.replaceRoot(spec)` | `$replaceRoot` | Returns `PipelineBuilder<G>`                  |
+| `.count(fieldName)`  | `$count`       | Returns `PipelineBuilder<{[k]: number}>`      |
+| `.facet(spec)`       | `$facet`       | Returns `PipelineBuilder<G>`                  |
+| `.unionWith(spec)`   | `$unionWith`   |                                               |
+| `.graphLookup(spec)` | `$graphLookup` |                                               |
+| `.bucket(spec)`      | `$bucket`      |                                               |
+| `.bucketAuto(spec)`  | `$bucketAuto`  |                                               |
+| `.redact(spec)`      | `$redact`      |                                               |
+| `.merge(spec)`       | `$merge`       | Terminal — write to another collection        |
+| `.raw(stage)`        | any            | Escape hatch for unsupported stages           |
+| `.build()`           | —              | Returns the `PipelineStage[]` array           |
 
 ### FilterOperator\<T\>
 

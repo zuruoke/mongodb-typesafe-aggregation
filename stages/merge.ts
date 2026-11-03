@@ -7,7 +7,8 @@ export interface MergeSpec<T> {
   into: string;
   on?: string | string[];
   let?: Record<string, T>;
-  whenMatched?: 'replace' | 'keepExisting' | 'merge' | 'fail' | 'pipeline';
+  /** An action, or an update pipeline to apply to the matched document. */
+  whenMatched?: 'replace' | 'keepExisting' | 'merge' | 'fail' | Record<string, unknown>[];
   whenNotMatched?: 'insert' | 'discard' | 'fail';
 }
 

@@ -1,4 +1,4 @@
-import { FilterOperator, filter } from '../types/filter';
+import { FilterOperator, filter, resolveFilters } from '../types/filter';
 
 describe('FilterOperator', () => {
   describe('comparison operators', () => {
@@ -103,6 +103,22 @@ describe('FilterOperator', () => {
 
     it('works the same as new FilterOperator()', () => {
       expect(filter<number>().gt(50).build()).toEqual(new FilterOperator<number>().gt(50).build());
+    });
+  });
+
+  describe('resolveFilters()', () => {
+    it('builds operators nested in objects and arrays', () => {
+      const query = { price: filter<number>().gt(1), $or: [{ stock: filter<number>().lt(5) }] };
+      expect(resolveFilters(query)).toEqual({
+        price: { $gt: 1 },
+        $or: [{ stock: { $lt: 5 } }],
+      });
+    });
+
+    it('keeps non-plain objects such as Date as they are', () => {
+      const since = new Date('2026-01-01');
+      const resolved = resolveFilters({ createdAt: { $gte: since } });
+      expect(resolved.createdAt.$gte).toBe(since);
     });
   });
 

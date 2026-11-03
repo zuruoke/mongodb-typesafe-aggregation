@@ -165,6 +165,29 @@ export function filter<T>(): FilterOperator<T> {
 }
 
 /**
+ * Replaces every `FilterOperator` inside a value with its built object.
+ * Only plain objects and arrays are walked, so values such as `Date` or `ObjectId` are kept as-is.
+ * @param value - The value to resolve
+ */
+export function resolveFilters<V>(value: V): V {
+  if (value instanceof FilterOperator) {
+    return value.build() as V;
+  }
+  if (Array.isArray(value)) {
+    return value.map(item => resolveFilters(item)) as V;
+  }
+  if (value !== null && typeof value === 'object') {
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype === Object.prototype || prototype === null) {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, item]) => [key, resolveFilters(item)]),
+      ) as V;
+    }
+  }
+  return value;
+}
+
+/**
  * Defines the specification for a match filter in MongoDB.
  * @template T - The type of the value to filter by
  */
