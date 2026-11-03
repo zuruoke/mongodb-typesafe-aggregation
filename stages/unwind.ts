@@ -18,7 +18,7 @@ export interface UnwindSpec<_T> {
  *
  * @example
  * ```ts
- * const stage = unwindStage("arrayField");
+ * const stage = unwindStage("$arrayField");
  * ```
  */
 export function unwindStage<T>(spec: string | UnwindSpec<T>) {

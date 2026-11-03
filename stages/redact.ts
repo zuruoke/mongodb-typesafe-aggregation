@@ -16,8 +16,7 @@ export interface RedactSpec<T> {
  * @example
  * ```ts
  * const stage = redactStage({
- *   name: 1,
- *   age: 1
+ *   $cond: { if: { $eq: ['$level', 5] }, then: '$$PRUNE', else: '$$DESCEND' }
  * });
  * ```
  */
