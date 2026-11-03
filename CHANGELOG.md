@@ -7,9 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
+### Changed (breaking)
 
 - Same-type stages (`match`, `sort`, `skip`, `limit`, `raw`, `unionWith`, `unset`, `merge`, `graphLookup`, `bucket`, `bucketAuto`, `redact`) no longer modify the builder they are called on. Every method now returns a new `PipelineBuilder`, so a base pipeline can be reused safely.
+
+  **Migration:** chained code is unaffected. Code that calls a stage without using the result must keep it:
+
+  ```ts
+  b.match({ status: 'pending' }); // before
+  b = b.match({ status: 'pending' }); // now
+  ```
+
+### Fixed
+
 - `match()` now builds `FilterOperator` values passed without `.build()`. The type already allowed them, but the class instance was sent to MongoDB as-is.
 - `MergeSpec.whenMatched` accepts an update pipeline (an array of stages) instead of the string `'pipeline'`, which MongoDB rejects.
 - `bucket()` no longer declares its own `T`, which hid the builder's document type.
